@@ -1,0 +1,279 @@
+/* 页面整体布局 */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.login-page {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.layui-row {
+    width: 1000px;
+    height: 600px;
+    box-shadow: 2px 0 6px rgba(0, 21, 41, .20);
+    border: 3px solid whitesmoke;
+    border-radius: 15px;
+    background: #fff;
+}
+
+/* 左侧插画区域 */
+.login-bg {
+    height: 100%;
+    box-sizing: border-box;
+    background-color: rgb(250, 250, 250);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom-left-radius: 15px;
+    border-top-left-radius: 15px;
+}
+
+.login-bg-img {
+    width: 90%;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+/* 右侧登录表单区域 */
+.login-form {
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border-bottom-right-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.form-center {
+    background: #fff;
+    box-sizing: border-box;
+    flex-flow: row wrap;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.form-center-box {
+    width: 360px;
+}
+
+/* 标题区域样式 */
+.top-log-title {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.top-log {
+    width: 50px;
+    border-radius: 12px;
+    margin-right: 20px;
+    height: 50px;
+}
+
+.top-log-title span {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--global-primary-color, #2d8cf0);
+}
+
+.top-desc {
+    font-size: 14px;
+    color: #808695;
+    margin-bottom: 40px;
+}
+
+/* 登录表单样式 */
+.login-form-box {
+    width: 100%;
+    text-align: left;
+}
+
+.login-form-box .layui-form-item {
+    margin-bottom: 20px;
+}
+
+/* 输入框样式 */
+.layui-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.layui-input-wrap:hover {
+    border-color: #40a9ff;
+}
+
+.layui-input-wrap:focus-within {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.layui-input-prefix {
+    padding: 0 12px;
+    color: #bfbfbf;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.layui-input-suffix {
+    padding: 0 12px;
+    color: #bfbfbf;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    cursor: pointer !important;
+    transition: color 0.3s;
+}
+
+.password-toggle:hover {
+    color: #1890ff !important;
+}
+
+.layui-input-wrap .layui-input {
+    border: none;
+    outline: none;
+    flex: 1;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
+    background: transparent;
+}
+
+.layui-input-wrap .layui-input:focus {
+    box-shadow: none;
+}
+
+/* 验证码输入框特殊样式 */
+.captcha-wrap {
+    position: relative;
+}
+
+.captcha-input {
+    padding-right: 130px !important;
+}
+
+.captcha-image-wrap {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.codeImage {
+    height: 32px;
+    width: 100px;
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+}
+
+/* 登录按钮样式 */
+.login-btn {
+    background: #52c41a !important;
+    border-color: #52c41a !important;
+    height: 44px !important;
+    line-height: 44px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+}
+
+.login-btn:hover {
+    background: #73d13d !important;
+    border-color: #73d13d !important;
+}
+
+.layui-form-checked[lay-skin=primary] i {
+    color: #fff !important;
+}
+
+
+/* 复选框样式调整 */
+.layui-form-checkbox {
+    margin: 0;
+}
+
+.layui-form-checkbox span {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 响应式样式 */
+@media (max-width: 1200px) {
+    .layui-row {
+        width: 90%;
+        max-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-page {
+        padding: 20px;
+    }
+
+    .layui-row {
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+    }
+
+    .login-bg {
+        display: none;
+    }
+
+    .login-form {
+        border-radius: 15px;
+    }
+
+    .form-center-box {
+        width: 100%;
+        max-width: 360px;
+        padding: 20px;
+    }
+
+    .top-log-title span {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-center-box {
+        padding: 15px;
+    }
+
+    .top-log {
+        width: 40px;
+        height: 40px;
+        margin-right: 15px;
+    }
+
+    .top-log-title span {
+        font-size: 20px;
+    }
+}
+
+/* 兼容性样式 */
+.layui-form-danger:focus {
+    box-shadow: 0px 0px 2px 1px #f56c6c !important;
+}

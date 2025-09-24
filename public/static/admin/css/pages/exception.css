@@ -1,0 +1,266 @@
+.pear-exception {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 70px 40px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.pear-exception .icon {
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.pear-exception .icon svg {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+}
+
+.pear-exception .title {
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.pear-exception .title p {
+    color: #ffffff;
+    font-size: 72px;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    animation: pulse 2s ease-in-out infinite alternate;
+}
+
+.pear-exception .description {
+    margin-top: 10px;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 500px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.pear-exception .extra {
+    margin: 30px 0;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.pear-exception .extra .layui-btn {
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-decoration: none;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.pear-exception .extra .layui-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    text-decoration: none;
+}
+
+.pear-exception .extra .layui-btn-sm {
+    background: rgba(255, 255, 255, 0.9);
+    color: #667eea;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.pear-exception .extra .layui-btn-sm:hover {
+    background: #ffffff;
+    color: #667eea;
+    border-color: #ffffff;
+}
+
+.pear-exception .extra .layui-btn-primary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.pear-exception .extra .layui-btn-primary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .pear-exception {
+        padding: 40px 20px;
+    }
+    
+    .pear-exception .icon {
+        margin-bottom: 15px;
+    }
+    
+    .pear-exception .icon > div {
+        width: 200px !important;
+        height: 235px !important;
+    }
+    
+    .pear-exception .title p {
+        font-size: 56px;
+    }
+    
+    .pear-exception .description {
+        font-size: 16px;
+        padding: 0 10px;
+    }
+    
+    .pear-exception .extra {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .pear-exception .extra .layui-btn {
+        width: 200px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .pear-exception .icon > div {
+        width: 150px !important;
+        height: 176px !important;
+    }
+    
+    .pear-exception .title p {
+        font-size: 48px;
+    }
+    
+    .pear-exception .description {
+        font-size: 14px;
+    }
+}
+
+/* 动画效果 */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* 页面加载动画 */
+.pear-exception {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 暗色主题支持 */
+.pear-admin-dark .pear-exception .title p {
+    color: #E5EAF3 !important;
+}
+
+.pear-admin-dark .pear-exception .description {
+    color: rgba(229, 234, 243, 0.9);
+}
+
+/* 特殊效果 */
+.pear-exception::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="90" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* 按钮图标样式 */
+.pear-exception .extra .layui-btn i {
+    font-size: 16px;
+}
+
+/* 错误信息容器 */
+.pear-exception-container {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    width: 100%;
+}
+
+/* 错误代码特殊样式 */
+.error-code-403 {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.error-code-404 {
+    background: linear-gradient(45deg, #3742fa, #2f3542);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.error-code-500 {
+    background: linear-gradient(45deg, #ff3838, #ff6348);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.error-code-419 {
+    background: linear-gradient(45deg, #ffa502, #ff9f43);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.error-code-429 {
+    background: linear-gradient(45deg, #ff9f43, #feca57);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.error-code-default {
+    background: linear-gradient(45deg, #a4b0be, #747d8c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}

@@ -1,0 +1,314 @@
+/**
+ * LPadmin 通用表格样式
+ * 解决表格布局、按钮大小、显示问题
+ */
+
+/* ==================== 表格容器样式 ==================== */
+
+/* 表格容器100%宽度 */
+.layui-table-view {
+    width: 100% !important;
+    margin: 0 !important;
+    overflow: visible !important;
+}
+
+/* 表格主体100%宽度 */
+.layui-table-main {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* 表格头部100%宽度 */
+.layui-table-header {
+    width: 100% !important;
+}
+
+/* 表格固定列 */
+.layui-table-fixed {
+    width: auto !important;
+}
+
+/* 卡片内容区域优化 */
+.layui-card-body {
+    padding: 15px !important;
+    overflow: visible !important;
+}
+
+/* 表格外层容器 */
+.layui-table-box {
+    width: 100% !important;
+    overflow: visible !important;
+}
+
+/* 强制表格占满容器宽度 */
+.layui-table {
+    width: 100% !important;
+    table-layout: auto !important;
+}
+
+/* ==================== 工具栏按钮样式 ==================== */
+
+/* 顶部工具栏按钮组 */
+.layui-table-tool .layui-btn-group {
+    margin-right: 10px;
+}
+
+/* 顶部工具栏按钮 - 小尺寸 */
+.layui-table-tool .layui-btn,
+.layui-table-tool .pear-btn {
+    height: 30px !important;
+    line-height: 30px !important;
+    padding: 0 12px !important;
+    font-size: 12px !important;
+    margin-right: 5px !important;
+}
+
+/* 顶部工具栏按钮图标 */
+.layui-table-tool .layui-btn .layui-icon,
+.layui-table-tool .pear-btn .layui-icon {
+    font-size: 12px !important;
+    margin-right: 3px !important;
+}
+
+/* ==================== 操作列按钮样式 ==================== */
+
+/* 新的操作按钮样式 */
+.table-action-btn {
+    width: 24px !important;
+    height: 24px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 编辑按钮 - 绿色 */
+.table-action-edit {
+    background-color: #5FB878 !important;
+    color: white !important;
+}
+
+.table-action-edit:hover {
+    background-color: #4CAF50 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(95, 184, 120, 0.3) !important;
+}
+
+/* 查看按钮 - 橙色 */
+.table-action-view {
+    background-color: #FFB800 !important;
+    color: white !important;
+}
+
+.table-action-view:hover {
+    background-color: #FF9800 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(255, 184, 0, 0.3) !important;
+}
+
+/* 添加按钮 - 橙色 */
+.table-action-add {
+    background-color: #FFB800 !important;
+    color: white !important;
+}
+
+.table-action-add:hover {
+    background-color: #FF9800 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(255, 184, 0, 0.3) !important;
+}
+
+/* 权限按钮 - 橙色 */
+.table-action-permission {
+    background-color: #FFB800 !important;
+    color: white !important;
+}
+
+.table-action-permission:hover {
+    background-color: #FF9800 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(255, 184, 0, 0.3) !important;
+}
+
+/* 删除按钮 - 红色 */
+.table-action-delete {
+    background-color: #FF5722 !important;
+    color: white !important;
+}
+
+.table-action-delete:hover {
+    background-color: #F44336 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(255, 87, 34, 0.3) !important;
+}
+
+/* 操作按钮图标 */
+.table-action-btn .layui-icon {
+    font-size: 12px !important;
+    margin: 0 !important;
+}
+
+/* 操作列宽度和对齐 */
+.layui-table tbody tr td:last-child {
+    text-align: center !important;
+    padding: 8px 5px !important;
+    min-width: 100px !important;
+    vertical-align: middle !important;
+}
+
+/* ==================== 表格行样式 ==================== */
+
+/* 表格行高度 */
+.layui-table tbody tr {
+    height: 45px !important;
+}
+
+/* 表格单元格内边距 */
+.layui-table tbody tr td {
+    padding: 8px 10px !important;
+    vertical-align: middle !important;
+}
+
+/* 表格头部单元格 */
+.layui-table thead tr th {
+    padding: 10px !important;
+    font-weight: 600 !important;
+    background-color: #fafafa !important;
+}
+
+/* ==================== 状态开关样式 ==================== */
+
+/* 状态开关容器 */
+.layui-table tbody tr td .layui-form-switch {
+    margin: 0 !important;
+}
+
+/* ==================== 头像图片样式 ==================== */
+
+/* 头像图片 */
+.layui-table tbody tr td img {
+    border: 1px solid #e6e6e6 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+/* ==================== 搜索表单样式 ==================== */
+
+/* 搜索表单按钮 */
+.layui-form .pear-btn {
+    height: 32px !important;
+    line-height: 32px !important;
+    padding: 0 15px !important;
+    font-size: 12px !important;
+}
+
+/* 搜索表单按钮图标 */
+.layui-form .pear-btn .layui-icon {
+    font-size: 12px !important;
+    margin-right: 3px !important;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+/* 小屏幕适配 */
+@media (max-width: 768px) {
+    /* 操作列按钮垂直排列 */
+    .layui-table tbody tr td .layui-btn-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+    }
+
+    /* 操作列按钮全宽 */
+    .layui-table tbody tr td .layui-btn,
+    .layui-table tbody tr td .pear-btn {
+        width: 100% !important;
+        margin-right: 0 !important;
+    }
+
+    /* 操作列最小宽度 */
+    .layui-table tbody tr td:last-child {
+        min-width: 60px !important;
+    }
+}
+
+/* ==================== 特殊列样式 ==================== */
+
+/* 序号列 */
+.layui-table tbody tr td:first-child {
+    text-align: center !important;
+    font-weight: 500 !important;
+    color: #666 !important;
+}
+
+/* 状态列 */
+.layui-table tbody tr td .layui-badge {
+    font-size: 11px !important;
+    padding: 2px 6px !important;
+}
+
+/* ==================== 分页样式 ==================== */
+
+/* 分页容器 */
+.layui-laypage {
+    clear: both !important;
+    position: relative !important;
+    z-index: 999 !important;
+    background: white !important;
+}
+
+/* 分页按钮 */
+.layui-laypage a,
+.layui-laypage span {
+    height: 30px !important;
+    line-height: 30px !important;
+    font-size: 12px !important;
+}
+
+/* 表格底部间距 */
+.layui-table-page {
+    border-top: 1px solid #e6e6e6 !important;
+    background: white !important;
+    position: relative !important;
+    z-index: 999 !important;
+}
+
+/* 防止分页与表格重叠 */
+.layui-table-view {
+    margin-bottom: 20px !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* 表格固定列不遮挡分页 */
+.layui-table-fixed {
+    z-index: 2 !important;
+}
+
+.layui-table-fixed-r {
+    z-index: 2 !important;
+}
+
+/* ==================== 工具提示 ==================== */
+
+/* 文字溢出省略号 */
+.text-ellipsis {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 150px !important;
+}
+
+/* 居中对齐 */
+.text-center {
+    text-align: center !important;
+}
+
+/* 右对齐 */
+.text-right {
+    text-align: right !important;
+}

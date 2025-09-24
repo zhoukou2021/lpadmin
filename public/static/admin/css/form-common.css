@@ -1,0 +1,283 @@
+/**
+ * LPadmin 通用表单页面样式
+ * 解决表单布局、按钮定位、内容遮挡问题
+ */
+
+/* ==================== 表单容器布局 ==================== */
+
+/* 主容器 */
+.mainBox {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* 表单内容区域 */
+.main-container {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 15px 20px !important;
+    padding-bottom: 80px !important; /* 为底部按钮留出空间 */
+}
+
+/* 底部按钮区域 */
+.bottom {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border-top: 1px solid #e6e6e6 !important;
+    padding: 12px 20px !important;
+    z-index: 1000 !important;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1) !important;
+    height: 60px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* 按钮容器 */
+.button-container {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+}
+
+/* ==================== 表单元素样式 ==================== */
+
+/* 表单项间距 */
+.layui-form-item {
+    margin-bottom: 18px !important;
+}
+
+/* 表单标签 */
+.layui-form-label {
+    width: 100px !important;
+    padding: 9px 15px !important;
+    font-weight: 500 !important;
+    text-align: right !important;
+}
+
+/* 必填标识 */
+.layui-form-label.required::before {
+    content: '*' !important;
+    color: #ff5722 !important;
+    margin-right: 3px !important;
+}
+
+/* 输入框容器 */
+.layui-input-block {
+    margin-left: 120px !important;
+}
+
+/* 输入框样式 */
+.layui-input,
+.layui-textarea,
+.layui-select {
+    border-radius: 4px !important;
+    border: 1px solid #e6e6e6 !important;
+    transition: border-color 0.2s ease !important;
+}
+
+.layui-input:focus,
+.layui-textarea:focus {
+    border-color: #1890ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+/* 文本域特殊处理 */
+.layui-textarea {
+    min-height: 80px !important;
+    resize: vertical !important;
+    font-family: inherit !important;
+}
+
+/* ==================== 按钮样式 ==================== */
+
+/* 表单按钮 */
+.bottom .pear-btn {
+    height: 36px !important;
+    line-height: 36px !important;
+    padding: 0 20px !important;
+    font-size: 14px !important;
+    border-radius: 4px !important;
+    min-width: 80px !important;
+}
+
+/* 主要按钮 */
+.bottom .pear-btn-primary {
+    background-color: #1890ff !important;
+    border-color: #1890ff !important;
+}
+
+.bottom .pear-btn-primary:hover {
+    background-color: #40a9ff !important;
+    border-color: #40a9ff !important;
+}
+
+/* 次要按钮 */
+.bottom .pear-btn:not(.pear-btn-primary) {
+    background-color: white !important;
+    border-color: #d9d9d9 !important;
+    color: #666 !important;
+}
+
+.bottom .pear-btn:not(.pear-btn-primary):hover {
+    border-color: #1890ff !important;
+    color: #1890ff !important;
+}
+
+/* 按钮图标 */
+.bottom .pear-btn .layui-icon {
+    margin-right: 5px !important;
+    font-size: 14px !important;
+}
+
+/* ==================== 上传组件样式 ==================== */
+
+/* 上传按钮 */
+.layui-upload .layui-btn {
+    margin-bottom: 10px !important;
+}
+
+/* 上传预览 */
+.layui-upload-img {
+    border: 1px solid #e6e6e6 !important;
+    border-radius: 4px !important;
+    object-fit: cover !important;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+/* 平板适配 */
+@media (max-width: 768px) {
+    .layui-form-label {
+        width: 80px !important;
+        padding: 9px 10px !important;
+    }
+
+    .layui-input-block {
+        margin-left: 100px !important;
+    }
+
+    .main-container {
+        padding: 15px !important;
+        padding-bottom: 90px !important;
+    }
+
+    .bottom {
+        padding: 12px 15px !important;
+    }
+
+    .button-container {
+        gap: 10px !important;
+    }
+
+    .bottom .pear-btn {
+        min-width: 100px !important;
+    }
+}
+
+/* 手机适配 */
+@media (max-width: 480px) {
+    .layui-form-item {
+        margin-bottom: 15px !important;
+    }
+
+    .layui-form-label {
+        width: 70px !important;
+        font-size: 12px !important;
+        padding: 9px 8px !important;
+    }
+
+    .layui-input-block {
+        margin-left: 85px !important;
+    }
+
+    .main-container {
+        padding: 10px !important;
+        padding-bottom: 90px !important;
+    }
+
+    .button-container {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .bottom .pear-btn {
+        width: 100% !important;
+        min-width: auto !important;
+    }
+}
+
+/* ==================== 特殊组件样式 ==================== */
+
+/* 单选框组 */
+.layui-form-item .layui-input-block .layui-form-radio {
+    margin-right: 15px !important;
+}
+
+/* 复选框组 */
+.layui-form-item .layui-input-block .layui-form-checkbox {
+    margin-right: 15px !important;
+}
+
+/* 开关组件 */
+.layui-form-switch {
+    margin-top: 5px !important;
+}
+
+
+
+/* ==================== 辅助样式 ==================== */
+
+/* 表单提示文字 */
+.layui-form-mid {
+    color: #999 !important;
+    font-size: 12px !important;
+}
+
+/* 错误提示 */
+.layui-form-danger {
+    border-color: #ff5722 !important;
+}
+
+.layui-form-danger:focus {
+    border-color: #ff5722 !important;
+    box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.1) !important;
+}
+
+/* 成功提示 */
+.layui-form-success {
+    border-color: #52c41a !important;
+}
+
+/* 禁用状态 */
+.layui-disabled {
+    background-color: #f5f5f5 !important;
+    cursor: not-allowed !important;
+}
+
+/* ==================== 滚动条样式 ==================== */
+
+/* 内容区域滚动条 */
+.main-container::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.main-container::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+    border-radius: 3px !important;
+}
+
+.main-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1 !important;
+    border-radius: 3px !important;
+}
+
+.main-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8 !important;
+}
