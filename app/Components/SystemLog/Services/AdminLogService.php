@@ -88,7 +88,7 @@ class AdminLogService
         ];
         
         foreach ($excludePatterns as $pattern) {
-            if (fnmatch($pattern, $routeName)) {
+            if (preg_match(shellToRegex($pattern), $routeName)) {
                 return true;
             }
         }

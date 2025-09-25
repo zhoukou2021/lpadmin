@@ -90,7 +90,7 @@ return [
     */
     'system' => [
         'name' => env('LPADMIN_SYSTEM_NAME', 'LPadmin管理系统'),
-        'version' => '1.0.0',
+        'version' => '1.0.1',
         'logo' => env('LPADMIN_LOGO', '/static/admin/images/logo.png'),
         'favicon' => env('LPADMIN_FAVICON', '/static/admin/images/favicon.ico'),
         'copyright' => env('LPADMIN_COPYRIGHT', 'Copyright © 2024 LPadmin'),

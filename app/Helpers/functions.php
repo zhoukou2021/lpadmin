@@ -120,3 +120,13 @@ if (!function_exists('lpadmin_url_prefix')) {
         return '/' . lpadmin_route_prefix();
     }
 }
+if (!function_exists('shellToRegex')) {
+    // 将shell通配符模式转换为正则表达式
+    function shellToRegex($pattern) {
+        $pattern = str_replace('.', '\.', $pattern);
+        $pattern = str_replace('*', '.*', $pattern);
+        $pattern = str_replace('?', '.', $pattern);
+        return '/^' . $pattern . '$/';
+    }
+}
+
