@@ -30,5 +30,6 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Exception $e) {
             // 忽略错误，避免在迁移时出现问题
         }
+        $this->app['url']->forceRootUrl(config('app.url'));
     }
 }
