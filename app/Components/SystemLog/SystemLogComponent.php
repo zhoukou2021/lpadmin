@@ -23,9 +23,7 @@ class SystemLogComponent
         try {
             Log::info('SystemLog component installation started');
 
-            // 创建数据表
-            Log::info('Creating SystemLog tables...');
-            self::createTables();
+            // 注意：数据表迁移由ComponentManager统一处理，这里不需要重复执行
 
             // 创建权限
             Log::info('Creating SystemLog permissions...');
@@ -41,8 +39,8 @@ class SystemLogComponent
             Log::error('SystemLog component installation failed: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
-            // 不重新抛出异常，让ComponentManager处理
-            // throw $e;
+            // 重新抛出异常，让ComponentManager的事务能够回滚
+            throw $e;
         }
     }
     
@@ -185,71 +183,74 @@ class SystemLogComponent
                 return;
             }
 
-            // 查找父级权限（系统管理）
-            $parentRule = Rule::where('name', 'system')->first();
+            // 使用独立事务处理权限创建
+            DB::transaction(function () use ($permissions) {
+                // 查找父级权限（系统管理）
+                $parentRule = Rule::where('name', 'system')->first();
 
-            // 创建系统日志权限组
-            $groupRuleData = [
-                'parent_id' => $parentRule ? $parentRule->id : 0,
-                'name' => 'system-log',
-                'title' => '系统日志管理',
-                'type' => Rule::TYPE_MENU,
-                'icon' => 'layui-icon-file',
-                'route_name' => 'lpadmin.system-log.index',
-                'url' => lpadmin_url_prefix() . '/system-log',
-                'component' => 'SystemLog',
-                'status' => Rule::STATUS_ENABLED,
-                'sort' => 100,
-                'remark' => '系统日志管理权限组',
-            ];
+                // 创建系统日志权限组
+                $groupRuleData = [
+                    'parent_id' => $parentRule ? $parentRule->id : 0,
+                    'name' => 'system-log',
+                    'title' => '系统日志管理',
+                    'type' => Rule::TYPE_MENU,
+                    'icon' => 'layui-icon-file',
+                    'route_name' => 'lpadmin.system-log.index',
+                    'url' => lpadmin_url_prefix() . '/system-log',
+                    'component' => 'SystemLog',
+                    'status' => Rule::STATUS_ENABLED,
+                    'sort' => 100,
+                    'remark' => '系统日志管理权限组',
+                ];
 
-            // 检查是否有软删除的权限组，如果有则恢复
-            $groupRule = Rule::withTrashed()->where('name', $groupRuleData['name'])->first();
-            if ($groupRule) {
-                if ($groupRule->trashed()) {
-                    $groupRule->restore();
-                    $groupRule->update($groupRuleData);
-                    Log::info('SystemLog permission group restored and updated');
+                // 检查是否有软删除的权限组，如果有则恢复
+                $groupRule = Rule::withTrashed()->where('name', $groupRuleData['name'])->first();
+                if ($groupRule) {
+                    if ($groupRule->trashed()) {
+                        $groupRule->restore();
+                        $groupRule->update($groupRuleData);
+                        Log::info('SystemLog permission group restored and updated');
+                    }
+                } else {
+                    $groupRule = Rule::create($groupRuleData);
+                    Log::info('SystemLog permission group created');
                 }
-            } else {
-                $groupRule = Rule::create($groupRuleData);
-                Log::info('SystemLog permission group created');
-            }
 
-            // 创建具体权限
-            $permissionMappings = [
-                'system-log.view' => ['title' => '查看系统日志', 'type' => Rule::TYPE_API],
-                'system-log.export' => ['title' => '导出系统日志', 'type' => Rule::TYPE_API],
-                'system-log.delete' => ['title' => '删除系统日志', 'type' => Rule::TYPE_API],
-            ];
+                // 创建具体权限
+                $permissionMappings = [
+                    'system-log.view' => ['title' => '查看系统日志', 'type' => Rule::TYPE_API],
+                    'system-log.export' => ['title' => '导出系统日志', 'type' => Rule::TYPE_API],
+                    'system-log.delete' => ['title' => '删除系统日志', 'type' => Rule::TYPE_API],
+                ];
 
-            foreach ($permissions as $permission) {
-                if (isset($permissionMappings[$permission])) {
-                    $mapping = $permissionMappings[$permission];
-                    $ruleData = [
-                        'parent_id' => $groupRule->id,
-                        'name' => $permission,
-                        'title' => $mapping['title'],
-                        'type' => $mapping['type'],
-                        'status' => Rule::STATUS_ENABLED,
-                        'sort' => 0,
-                        'remark' => '系统日志' . $mapping['title'] . '权限',
-                    ];
+                foreach ($permissions as $permission) {
+                    if (isset($permissionMappings[$permission])) {
+                        $mapping = $permissionMappings[$permission];
+                        $ruleData = [
+                            'parent_id' => $groupRule->id,
+                            'name' => $permission,
+                            'title' => $mapping['title'],
+                            'type' => $mapping['type'],
+                            'status' => Rule::STATUS_ENABLED,
+                            'sort' => 0,
+                            'remark' => '系统日志' . $mapping['title'] . '权限',
+                        ];
 
-                    // 检查是否有软删除的权限，如果有则恢复
-                    $existingRule = Rule::withTrashed()->where('name', $permission)->first();
-                    if ($existingRule) {
-                        if ($existingRule->trashed()) {
-                            $existingRule->restore();
-                            $existingRule->update($ruleData);
-                            Log::info("SystemLog permission restored: {$permission}");
+                        // 检查是否有软删除的权限，如果有则恢复
+                        $existingRule = Rule::withTrashed()->where('name', $permission)->first();
+                        if ($existingRule) {
+                            if ($existingRule->trashed()) {
+                                $existingRule->restore();
+                                $existingRule->update($ruleData);
+                                Log::info("SystemLog permission restored: {$permission}");
+                            }
+                        } else {
+                            Rule::create($ruleData);
+                            Log::info("SystemLog permission created: {$permission}");
                         }
-                    } else {
-                        Rule::create($ruleData);
-                        Log::info("SystemLog permission created: {$permission}");
                     }
                 }
-            }
+            });
 
             Log::info('SystemLog permissions created successfully');
 

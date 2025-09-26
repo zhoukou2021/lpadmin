@@ -164,15 +164,16 @@ class ComponentManager
                 throw new Exception("组件配置文件不存在或格式错误");
             }
 
-            // 使用单一事务处理所有数据库操作
+            // 分步执行，每个步骤自己管理事务
+
+            // 1. 运行数据库迁移（迁移命令自己管理事务）
+            self::runMigrations($componentName);
+
+            // 2. 执行组件安装钩子（包含权限创建等数据库操作）
+            self::executeInstallHook($componentName);
+
+            // 3. 更新组件状态（使用独立事务）
             DB::transaction(function () use ($componentName) {
-                // 1. 运行数据库迁移
-                self::runMigrations($componentName);
-
-                // 2. 执行组件安装钩子（包含权限创建等数据库操作）
-                self::executeInstallHook($componentName);
-
-                // 3. 更新组件状态
                 self::updateComponentStatus($componentName, self::STATUS_INSTALLED);
             });
 
@@ -427,16 +428,19 @@ class ComponentManager
      */
     protected static function executeInstallHook(string $componentName): void
     {
-        try {
-            $componentClass = "App\\Components\\{$componentName}\\{$componentName}Component";
+        $componentClass = "App\\Components\\{$componentName}\\{$componentName}Component";
 
-            if (class_exists($componentClass) && method_exists($componentClass, 'install')) {
+        if (class_exists($componentClass) && method_exists($componentClass, 'install')) {
+            try {
                 $componentClass::install();
+            } catch (\Exception $e) {
+                Log::error("组件安装钩子执行失败: {$componentName}", [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                // 重新抛出异常，确保事务能够回滚
+                throw $e;
             }
-        } catch (\Exception $e) {
-            Log::warning("组件安装钩子执行失败: {$componentName}", [
-                'error' => $e->getMessage()
-            ]);
         }
     }
 
