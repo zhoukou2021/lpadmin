@@ -12,29 +12,23 @@ use App\Components\SystemLog\Controllers\SystemLogController;
 |
 */
 
-Route::middleware(['lpadmin.permission:system-log.view'])->group(function () {
+Route::prefix('system-log')->name('system-log.')->group(function () {
     // 日志列表
-    Route::get('system-log', [SystemLogController::class, 'index'])->name('system-log.index');
+    Route::get('system-log', [SystemLogController::class, 'index'])->name('index');
     
     // 日志详情
-    Route::get('system-log/{log}', [SystemLogController::class, 'show'])->name('system-log.show');
+    Route::get('{log}', [SystemLogController::class, 'show'])->name('show');
     
     // 获取统计信息
-    Route::get('system-log/api/statistics', [SystemLogController::class, 'statistics'])->name('system-log.statistics');
-});
-
-Route::middleware(['lpadmin.permission:system-log.export'])->group(function () {
+    Route::get('api/statistics', [SystemLogController::class, 'statistics'])->name('statistics');
     // 导出日志
-    Route::post('system-log/export', [SystemLogController::class, 'export'])->name('system-log.export');
-});
-
-Route::middleware(['lpadmin.permission:system-log.delete'])->group(function () {
+    Route::post('export', [SystemLogController::class, 'export'])->name('export');
     // 删除单个日志
-    Route::delete('system-log/{log}', [SystemLogController::class, 'destroy'])->name('system-log.destroy');
+    Route::delete('{log}', [SystemLogController::class, 'destroy'])->name('destroy');
     
     // 批量删除日志
-    Route::post('system-log/batch-delete', [SystemLogController::class, 'batchDelete'])->name('system-log.batch-delete');
+    Route::post('batch-delete', [SystemLogController::class, 'batchDelete'])->name('batch-delete');
     
     // 清空日志
-    Route::post('system-log/clear', [SystemLogController::class, 'clear'])->name('system-log.clear');
+    Route::post('clear', [SystemLogController::class, 'clear'])->name('clear');
 });
