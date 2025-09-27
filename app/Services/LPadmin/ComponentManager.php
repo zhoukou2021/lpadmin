@@ -265,17 +265,31 @@ class ComponentManager
     
     /**
      * 运行组件数据库迁移
-     * 
+     *
      * @param string $componentName
      */
     public static function runMigrations(string $componentName): void
     {
-        $migrationsPath = base_path(self::COMPONENTS_PATH . '/' . $componentName . '/database/migrations');
-        
+        // 使用DIRECTORY_SEPARATOR确保跨平台兼容性
+        $migrationsPath = base_path(self::COMPONENTS_PATH . DIRECTORY_SEPARATOR . $componentName . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations');
+
         if (File::exists($migrationsPath)) {
-            Artisan::call('migrate', [
-                '--path' => 'app/Components/' . $componentName . '/database/migrations'
+            // 使用相对路径，Laravel会自动处理路径分隔符
+            $relativePath = 'app' . DIRECTORY_SEPARATOR . 'Components' . DIRECTORY_SEPARATOR . $componentName . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';
+
+            Log::info("运行组件迁移: {$componentName}", [
+                'migrations_path' => $migrationsPath,
+                'relative_path' => $relativePath
             ]);
+
+            Artisan::call('migrate', [
+                '--path' => $relativePath,
+                '--force' => true
+            ]);
+
+            Log::info("组件迁移执行完成: {$componentName}");
+        } else {
+            Log::warning("组件迁移目录不存在: {$migrationsPath}");
         }
     }
     
@@ -286,12 +300,20 @@ class ComponentManager
      */
     protected static function rollbackMigrations(string $componentName): void
     {
-        $migrationsPath = base_path(self::COMPONENTS_PATH . '/' . $componentName . '/database/migrations');
+        // 使用DIRECTORY_SEPARATOR确保跨平台兼容性
+        $migrationsPath = base_path(self::COMPONENTS_PATH . DIRECTORY_SEPARATOR . $componentName . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations');
 
         if (File::exists($migrationsPath)) {
             try {
                 // 获取组件相关的迁移记录
                 $migrationFiles = File::files($migrationsPath);
+                $relativePath = 'app' . DIRECTORY_SEPARATOR . 'Components' . DIRECTORY_SEPARATOR . $componentName . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';
+
+                Log::info("开始回滚组件迁移: {$componentName}", [
+                    'migrations_path' => $migrationsPath,
+                    'relative_path' => $relativePath,
+                    'files_count' => count($migrationFiles)
+                ]);
 
                 foreach (array_reverse($migrationFiles) as $file) {
                     $migrationName = pathinfo($file, PATHINFO_FILENAME);
@@ -304,8 +326,9 @@ class ComponentManager
                     if ($executed) {
                         // 执行回滚
                         Artisan::call('migrate:rollback', [
-                            '--path' => 'app/Components/' . $componentName . '/database/migrations',
-                            '--step' => 1
+                            '--path' => $relativePath,
+                            '--step' => 1,
+                            '--force' => true
                         ]);
 
                         Log::info("回滚迁移成功: {$migrationName}");
@@ -320,6 +343,8 @@ class ComponentManager
                 ]);
                 throw $e;
             }
+        } else {
+            Log::warning("组件迁移目录不存在: {$migrationsPath}");
         }
     }
     
