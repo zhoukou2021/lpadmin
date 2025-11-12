@@ -60,23 +60,7 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">头像</label>
                         <div class="layui-input-block">
-                            <div class="avatar-selector">
-                                <div class="avatar-preview-container" style="margin-bottom: 10px;">
-                                    <img id="avatar-preview" src="/static/images/default-avatar.png"
-                                         style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #e6e6e6; cursor: pointer;"
-                                         onclick="selectUserAvatar()" title="点击选择头像">
-                                </div>
-                                <div class="avatar-actions">
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" onclick="selectUserAvatar()">
-                                        <i class="layui-icon layui-icon-picture"></i> 选择头像
-                                    </button>
-                                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" onclick="clearUserAvatar()">
-                                        <i class="layui-icon layui-icon-delete"></i> 清除
-                                    </button>
-                                </div>
-                                <input type="hidden" name="avatar" id="avatar-input">
-                                <div class="layui-form-mid layui-word-aux">点击图片或按钮选择头像，支持jpg、png格式</div>
-                            </div>
+                            <input type="file" name="avatar_file" accept="image/*" class="layui-input">
                         </div>
                     </div>
 
@@ -140,10 +124,27 @@
                 if (window.RadioHelper) {
                     RadioHelper.fixFormData(data.field, ['status']);
                 }
+
+                // 创建 FormData 对象以支持文件上传
+                let formData = new FormData();
+                
+                // 添加所有表单字段
+                for (let key in data.field) {
+                    formData.append(key, data.field[key]);
+                }
+
+                // 添加文件（如果存在）
+                let avatarFile = $('input[name="avatar_file"]')[0].files[0];
+                if (avatarFile) {
+                    formData.append('avatar_file', avatarFile);
+                }
+
                 $.ajax({
                     url: SAVE_API,
                     type: 'POST',
-                    data: data.field,
+                    data: formData,
+                    processData: false,  // 不处理数据，让 jQuery 自动处理 FormData
+                    contentType: false,  // 不设置内容类型，让浏览器自动设置（包含 boundary）
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
@@ -194,33 +195,6 @@
             });
 
         });
-
-        // 选择用户头像
-        function selectUserAvatar() {
-            layui.layer.open({
-                type: 2,
-                title: '选择用户头像',
-                area: ['80%', '70%'],
-                content: '/lpadmin/upload/selector?type=image&mode=single&callback=setUserAvatar'
-            });
-        }
-
-        // 设置用户头像
-        function setUserAvatar(selectedFiles) {
-            if (selectedFiles.length > 0) {
-                let file = selectedFiles[0];
-                layui.$('#avatar-preview').attr('src', file.url);
-                layui.$('#avatar-input').val(file.url);
-                layui.popup.success('头像设置成功');
-            }
-        }
-
-        // 清除用户头像
-        function clearUserAvatar() {
-            layui.$('#avatar-preview').attr('src', '/static/images/default-avatar.png');
-            layui.$('#avatar-input').val('');
-            layui.popup.success('头像已清除');
-        }
 
     </script>
 

@@ -24,7 +24,6 @@ class CacheService
     const CACHE_TYPE_APPLICATION = 'application';
     const CACHE_TYPE_MENU = 'menu';
     const CACHE_TYPE_PERMISSION = 'permission';
-    const CACHE_TYPE_DICTIONARY = 'dictionary';
     const CACHE_TYPE_SYSTEM = 'system';
 
     /**
@@ -67,11 +66,6 @@ class CacheService
                 'name' => '权限缓存',
                 'description' => '用户权限缓存',
                 'icon' => 'layui-icon-vercode',
-            ],
-            self::CACHE_TYPE_DICTIONARY => [
-                'name' => '字典缓存',
-                'description' => '数据字典缓存',
-                'icon' => 'layui-icon-list',
             ],
             self::CACHE_TYPE_SYSTEM => [
                 'name' => '系统缓存',
@@ -127,11 +121,6 @@ class CacheService
                 case self::CACHE_TYPE_PERMISSION:
                     self::clearPermissionCache();
                     $result['message'] = '权限缓存清除成功';
-                    break;
-
-                case self::CACHE_TYPE_DICTIONARY:
-                    self::clearDictionaryCache();
-                    $result['message'] = '字典缓存清除成功';
                     break;
 
                 case self::CACHE_TYPE_SYSTEM:
@@ -338,13 +327,6 @@ class CacheService
                 case self::CACHE_TYPE_APPLICATION:
                     $path = storage_path('framework/cache');
                     return self::getDirectorySize($path);
-
-                case self::CACHE_TYPE_DICTIONARY:
-                    // 估算字典缓存大小
-                    $dictCount = \App\Models\LPadmin\Dictionary::count();
-                    $estimatedSize = $dictCount * 1024; // 每个字典估算1KB
-                    return self::formatBytes($estimatedSize);
-
                 default:
                     return '未知';
             }
@@ -366,9 +348,6 @@ class CacheService
                 case self::CACHE_TYPE_VIEW:
                     $path = storage_path('framework/views');
                     return File::exists($path) ? count(File::allFiles($path)) : 0;
-
-                case self::CACHE_TYPE_DICTIONARY:
-                    return \App\Models\LPadmin\Dictionary::count();
 
                 default:
                     return 0;

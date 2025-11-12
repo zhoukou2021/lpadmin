@@ -9,14 +9,9 @@ use App\Http\Controllers\LPadmin\RoleController;
 use App\Http\Controllers\LPadmin\RuleController;
 use App\Http\Controllers\LPadmin\UserController;
 use App\Http\Controllers\LPadmin\MenuController;
-use App\Http\Controllers\LPadmin\UploadController;
 use App\Http\Controllers\LPadmin\ConfigController;
 use App\Http\Controllers\LPadmin\CacheController;
-use App\Http\Controllers\LPadmin\DictionaryController;
-use App\Http\Controllers\LPadmin\DictionaryItemController;
 use App\Http\Controllers\LPadmin\DocController;
-use App\Http\Controllers\LPadmin\ComponentController;
-use App\Services\LPadmin\ComponentRouteManager;
 
 /*
 |--------------------------------------------------------------------------
@@ -260,87 +255,8 @@ Route::group($groupConfig, function () {
             Route::post('value', [CacheController::class, 'setValue'])->name('setValue'); // 设置缓存值
         });
 
-        /*
-        |----------------------------------------------------------------------
-        | 数据字典管理
-        |----------------------------------------------------------------------
-        */
-        Route::prefix('dictionary')->name('dictionary.')->group(function () {
-            Route::get('select', [DictionaryController::class, 'select'])->name('select'); // 获取字典选择列表
-            Route::get('statistics', [DictionaryController::class, 'statistics'])->name('statistics'); // 获取字典统计信息
-            Route::get('data', [DictionaryController::class, 'getDictData'])->name('data'); // 获取字典数据API
-            Route::get('options', [DictionaryController::class, 'getDictOptions'])->name('options'); // 获取字典选项API
-            Route::post('clear-cache', [DictionaryController::class, 'clearCache'])->name('clear_cache'); // 清除字典缓存
-            Route::get('usage', [DictionaryController::class, 'usage'])->name('usage'); // 字典使用示例页面
-            Route::post('{dictionary}/toggle-status', [DictionaryController::class, 'toggleStatus'])->name('toggle_status'); // 切换字典状态
-            Route::post('batch-destroy', [DictionaryController::class, 'batchDestroy'])->name('batch_destroy'); // 批量删除字典
-
-            // 字典项管理
-            Route::prefix('{dictionary}/items')->name('items.')->group(function () {
-                Route::get('select', [DictionaryItemController::class, 'select'])->name('select'); // 获取字典项选择列表
-                Route::post('{item}/toggle-status', [DictionaryItemController::class, 'toggleStatus'])->name('toggle_status'); // 切换字典项状态
-                Route::post('batch-destroy', [DictionaryItemController::class, 'batchDestroy'])->name('batch_destroy'); // 批量删除字典项
-                Route::post('batch-sort', [DictionaryItemController::class, 'batchSort'])->name('batch_sort'); // 批量更新字典项排序
-                Route::resource('/', DictionaryItemController::class)->parameters(['' => 'item']); // 字典项资源路由
-            });
-            Route::resource('/', DictionaryController::class)->parameters(['' => 'dictionary']); // 字典资源路由
-        });
-
-
-        /*
-        |----------------------------------------------------------------------
-        | 组件管理
-        |----------------------------------------------------------------------
-        */
-        Route::prefix('component')->name('component.')->group(function () {
-            Route::get('/', [ComponentController::class, 'index'])->name('index'); // 组件列表页面
-            Route::get('{name}', [ComponentController::class, 'show'])->name('show'); // 组件详情页面
-            Route::post('install', [ComponentController::class, 'install'])->name('install'); // 安装组件
-            Route::post('uninstall', [ComponentController::class, 'uninstall'])->name('uninstall'); // 卸载组件
-            Route::post('refresh', [ComponentController::class, 'refresh'])->name('refresh'); // 刷新组件列表
-            Route::get('api/statistics', [ComponentController::class, 'statistics'])->name('statistics'); // 获取组件统计信息
-            Route::get('{name}/validate', [ComponentController::class, 'validateComponent'])->name('validate'); // 验证组件
-            Route::post('batch-action', [ComponentController::class, 'batchAction'])->name('batch_action'); // 批量操作组件
-        });
-
-        /*
-        |----------------------------------------------------------------------
-        | 文件上传管理
-        |----------------------------------------------------------------------
-        */
-        Route::prefix('upload')->name('upload.')->group(function () {
-            Route::get('/', [UploadController::class, 'index'])->name('index'); // 文件管理列表页面
-            Route::get('create', [UploadController::class, 'create'])->name('create'); // 显示文件上传页面
-            Route::post('store', [UploadController::class, 'upload'])->name('store'); // 上传文件
-            Route::post('file', [UploadController::class, 'uploadFile'])->name('file'); // 上传普通文件
-            Route::post('image', [UploadController::class, 'uploadImage'])->name('image'); // 上传图片文件
-            Route::post('avatar', [UploadController::class, 'uploadImage'])->name('avatar'); // 上传头像
-            Route::get('selector', [UploadController::class, 'selector'])->name('selector'); // 文件选择器页面
-            Route::get('config', [UploadController::class, 'config'])->name('config'); // 获取上传配置信息
-            Route::get('config-page', [UploadController::class, 'configPage'])->name('config_page'); // 上传配置管理页面
-            Route::post('config-update', [UploadController::class, 'updateConfig'])->name('config_update'); // 更新上传配置
-            Route::get('categories', [UploadController::class, 'categories'])->name('categories'); // 获取文件分类列表
-            Route::get('statistics', [UploadController::class, 'statistics'])->name('statistics'); // 获取文件统计信息
-            Route::get('popular-tags', [UploadController::class, 'popularTags'])->name('popular_tags'); // 获取热门标签列表
-            Route::get('{upload}/preview', [UploadController::class, 'preview'])->name('preview'); // 预览文件内容
-            Route::get('{upload}/download', [UploadController::class, 'download'])->name('download'); // 下载文件
-            Route::get('{upload}/thumbnail', [UploadController::class, 'thumbnail'])->name('thumbnail'); // 获取文件缩略图
-            Route::put('{upload}/update-info', [UploadController::class, 'updateFile'])->name('update_info'); // 更新文件信息
-            Route::post('batch-delete', [UploadController::class, 'batchDelete'])->name('batch_delete'); // 批量删除文件
-            Route::get('{upload}', [UploadController::class, 'show'])->name('show'); // 查看文件详情
-            Route::delete('{upload}', [UploadController::class, 'destroy'])->name('destroy'); // 删除文件
-        });
     });
 });
 
-/*
-|--------------------------------------------------------------------------
-| 组件路由注册
-|--------------------------------------------------------------------------
-|
-| 在这里注册所有组件的路由
-|
-*/
 
-// 注册所有组件路由
-ComponentRouteManager::registerAllComponentRoutes();
+ 

@@ -42,9 +42,6 @@ class SimplifiedPermissionSeeder extends Seeder
 
         // 创建系统配置
         $this->createOptions();
-
-        // 创建字典数据
-        $this->createDictionaries();
     }
 
     /**
@@ -58,14 +55,12 @@ class SimplifiedPermissionSeeder extends Seeder
             // 清理关联表
             DB::table('admin_roles')->truncate();
             DB::table('role_rules')->truncate();
-            DB::table('dictionary_items')->truncate();
 
             // 清理主表（注意：有外键约束的表需要特殊处理）
             DB::table('admins')->truncate();
             DB::table('roles')->truncate();
             DB::table('rules')->truncate();
             DB::table('options')->truncate();
-            DB::table('dictionaries')->truncate();
         } catch (\Exception) {
             // 如果TRUNCATE失败，使用DELETE方式
             $this->cleanupWithDelete();
@@ -83,25 +78,21 @@ class SimplifiedPermissionSeeder extends Seeder
         // 清理关联表
         DB::table('admin_roles')->delete();
         DB::table('role_rules')->delete();
-        DB::table('dictionary_items')->delete();
 
         // 清理主表
         DB::table('admins')->delete();
         DB::table('roles')->delete();
         DB::table('rules')->delete();
         DB::table('options')->delete();
-        DB::table('dictionaries')->delete();
 
         // 重置自增ID（可选）
         DB::statement('ALTER TABLE admin_roles AUTO_INCREMENT = 1');
         DB::statement('ALTER TABLE role_rules AUTO_INCREMENT = 1');
-        DB::statement('ALTER TABLE dictionary_items AUTO_INCREMENT = 1');
         DB::statement('ALTER TABLE admin_logs AUTO_INCREMENT = 1');
         DB::statement('ALTER TABLE admins AUTO_INCREMENT = 1');
         DB::statement('ALTER TABLE roles AUTO_INCREMENT = 1');
         DB::statement('ALTER TABLE rules AUTO_INCREMENT = 1');
         DB::statement('ALTER TABLE options AUTO_INCREMENT = 1');
-        DB::statement('ALTER TABLE dictionaries AUTO_INCREMENT = 1');
     }
 
     /**
@@ -218,25 +209,6 @@ class SimplifiedPermissionSeeder extends Seeder
                             ['name' => 'menu.batchDestroy', 'title' => '批量删除', 'type' => 'button', 'is_show' => 0],
                         ]
                     ],
-                    [
-                        'name' => 'component',
-                        'title' => '组件管理',
-                        'type' => 'menu',
-                        'icon' => 'layui-icon-component',
-                        'url' => $this->getRoutePrefix() . '/component',
-                        'is_show' => 1,
-                        'sort' => 550,
-                        'children' => [
-                            ['name' => 'component.index', 'title' => '组件列表', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'component.show', 'title' => '组件详情', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'component.install', 'title' => '安装组件', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'component.uninstall', 'title' => '卸载组件', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'component.refresh', 'title' => '刷新组件', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'component.statistics', 'title' => '组件统计', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'component.validate', 'title' => '验证组件', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'component.batch_action', 'title' => '批量操作', 'type' => 'button', 'is_show' => 0],
-                        ]
-                    ],
                 ]
             ],
 
@@ -261,40 +233,6 @@ class SimplifiedPermissionSeeder extends Seeder
                     ['name' => 'user.toggle_status', 'title' => '切换状态', 'type' => 'button', 'is_show' => 0],
                     ['name' => 'user.batch_delete', 'title' => '批量删除', 'type' => 'button', 'is_show' => 0],
                     ['name' => 'user.statistics', 'title' => '用户统计', 'type' => 'api', 'is_show' => 0],
-                ]
-            ],
-
-            // ==================== 文件管理 ====================
-            [
-                'name' => 'upload',
-                'title' => '文件管理',
-                'type' => 'menu',
-                'icon' => 'layui-icon-upload',
-                'url' => $this->getRoutePrefix() . '/upload',
-                'is_show' => 1,
-                'sort' => 800,
-                'children' => [
-                    ['name' => 'upload.index', 'title' => '文件列表', 'type' => 'menu', 'is_show' => 1,'url' => $this->getRoutePrefix() . '/upload',
-                    'children' => [
-                        ['name' => 'upload.create', 'title' => '上传页面', 'type' => 'button', 'is_show' => 0],
-                        ['name' => 'upload.store', 'title' => '上传文件', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.file', 'title' => '上传普通文件', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.image', 'title' => '上传图片', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.avatar', 'title' => '上传头像', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.show', 'title' => '查看文件', 'type' => 'button', 'is_show' => 0],
-                        ['name' => 'upload.destroy', 'title' => '删除文件', 'type' => 'button', 'is_show' => 0],
-                        ['name' => 'upload.batch_delete', 'title' => '批量删除', 'type' => 'button', 'is_show' => 0],
-                        ['name' => 'upload.download', 'title' => '下载文件', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.preview', 'title' => '预览文件', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.selector', 'title' => '文件选择器', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.statistics', 'title' => '文件统计', 'type' => 'api', 'is_show' => 0],
-                    ]],
-                    ['name' => 'upload.config_page', 'title' => '配置管理', 'type' => 'menu', 'is_show' => 1,'url' => $this->getRoutePrefix() . '/upload/config-page',
-                    'children' => [
-                        ['name' => 'upload.config_update', 'title' => '更新上传配置', 'type' => 'api', 'is_show' => 0],
-                        ['name' => 'upload.config', 'title' => '上传配置', 'type' => 'api', 'is_show' => 0],
-                    ]],
-                    
                 ]
             ],
 
@@ -337,45 +275,6 @@ class SimplifiedPermissionSeeder extends Seeder
                         ['name' => 'config.groups.batch_delete', 'title' => '批量删除分组', 'type' => 'api', 'is_show' => 0],
                         ['name' => 'config.groups.show', 'title' => '查看分组', 'type' => 'api', 'is_show' => 0],
                     ]],
-                    // ==================== 数据字典 ====================
-                    [
-                        'name' => 'dictionary',
-                        'title' => '数据字典',
-                        'type' => 'menu',
-                        'icon' => 'layui-icon-template-1',
-                        'url' => $this->getRoutePrefix() . '/dictionary',
-                        'is_show' => 1,
-                        'sort' => 700,
-                        'children' => [
-                            ['name' => 'dictionary.index', 'title' => '字典列表', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.create', 'title' => '创建字典', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.store', 'title' => '保存字典', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.show', 'title' => '查看字典', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.edit', 'title' => '编辑字典', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.update', 'title' => '更新字典', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.destroy', 'title' => '删除字典', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.select', 'title' => '字典选择', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.statistics', 'title' => '字典统计', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.data', 'title' => '字典数据', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.options', 'title' => '字典选项', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.clear_cache', 'title' => '清除缓存', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.usage', 'title' => '使用示例', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.toggle_status', 'title' => '切换状态', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.batch_destroy', 'title' => '批量删除', 'type' => 'button', 'is_show' => 0],
-                            // 字典项管理
-                            ['name' => 'dictionary.items.index', 'title' => '字典项列表', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.items.create', 'title' => '创建字典项', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.items.store', 'title' => '保存字典项', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.items.show', 'title' => '查看字典项', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.items.edit', 'title' => '编辑字典项', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.items.update', 'title' => '更新字典项', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.items.destroy', 'title' => '删除字典项', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.items.select', 'title' => '字典项选择', 'type' => 'api', 'is_show' => 0],
-                            ['name' => 'dictionary.items.toggle_status', 'title' => '切换字典项状态', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.items.batch_destroy', 'title' => '批量删除字典项', 'type' => 'button', 'is_show' => 0],
-                            ['name' => 'dictionary.items.batch_sort', 'title' => '批量排序', 'type' => 'api', 'is_show' => 0],
-                        ]
-                    ],
                 ]
             ],
 
@@ -500,8 +399,6 @@ class SimplifiedPermissionSeeder extends Seeder
                     'dashboard',
                     'user', 'user.create', 'user.update', 'user.toggle_status', 'user.statistics',
                     'config', 'config.select',
-                    'dictionary',
-                    'upload',
                 ])->pluck('id')->toArray();
                 $role->rules()->sync($operatorRuleIds);
             }
@@ -625,65 +522,18 @@ class SimplifiedPermissionSeeder extends Seeder
                 'description' => '版权信息',
                 'sort' => 70
             ],
-
-            // ==================== 文件上传配置 ====================
             [
-                'group' => 'upload',
-                'name' => 'upload_disk',
-                'title' => '存储方式',
-                'value' => 'public',
-                'type' => 'select',
+                'group' => 'system',
+                'name' => 'lang',
+                'title' => '多语言',
+                'value' => 'zh_CN,en',
+                'type' => 'checkbox',
                 'options' => json_encode([
-                    'public' => '本地公共存储',
-                    'local' => '本地私有存储'
+                    'zh_CN' => '中文',
+                    'en' => '英文',
                 ]),
-                'description' => '文件存储方式选择',
-                'sort' => 100
-            ],
-            [
-                'group' => 'upload',
-                'name' => 'upload_path',
-                'title' => '存储路径',
-                'value' => 'lpadmin/uploads',
-                'type' => 'text',
-                'description' => '相对于存储磁盘的路径',
-                'sort' => 90
-            ],
-            [
-                'group' => 'upload',
-                'name' => 'upload_max_size',
-                'title' => '最大文件大小',
-                'value' => '10240',
-                'type' => 'number',
-                'description' => '单位：KB，范围：1KB - 100MB',
-                'sort' => 80
-            ],
-            [
-                'group' => 'upload',
-                'name' => 'upload_allowed_extensions',
-                'title' => '允许的文件类型',
-                'value' => json_encode(['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'zip', 'rar']),
-                'type' => 'textarea',
-                'description' => '允许上传的文件扩展名，JSON格式',
-                'sort' => 70
-            ],
-            [
-                'group' => 'upload',
-                'name' => 'enable_security_check',
-                'title' => '启用安全检查',
-                'value' => '1',
-                'type' => 'switch',
-                'description' => '检查文件内容是否安全',
+                'description' => '多语言',
                 'sort' => 60
-            ],
-            [
-                'group' => 'upload',
-                'name' => 'enable_duplicate_check',
-                'title' => '启用重复检查',
-                'value' => '1',
-                'type' => 'switch',
-                'description' => '检查是否上传重复文件',
-                'sort' => 50
             ],
 
             // ==================== 缓存配置 ====================
@@ -752,68 +602,6 @@ class SimplifiedPermissionSeeder extends Seeder
 
         foreach ($options as $option) {
             Option::create($option);
-        }
-    }
-
-    /**
-     * 创建字典数据
-     */
-    private function createDictionaries(): void
-    {
-        $dictionaries = [
-            [
-                'name' => 'user_status',
-                'title' => '用户状态',
-                'description' => '用户账户状态字典',
-                'status' => 1,
-                'sort' => 100,
-                'items' => [
-                    ['label' => '正常', 'value' => '1', 'sort' => 1, 'status' => 1],
-                    ['label' => '禁用', 'value' => '0', 'sort' => 2, 'status' => 1],
-                ]
-            ],
-            [
-                'name' => 'admin_status',
-                'title' => '管理员状态',
-                'description' => '管理员账户状态字典',
-                'status' => 1,
-                'sort' => 90,
-                'items' => [
-                    ['label' => '正常', 'value' => '1', 'sort' => 1, 'status' => 1],
-                    ['label' => '禁用', 'value' => '0', 'sort' => 2, 'status' => 1],
-                ]
-            ],
-            [
-                'name' => 'gender',
-                'title' => '性别',
-                'description' => '性别字典',
-                'status' => 1,
-                'sort' => 80,
-                'items' => [
-                    ['label' => '男', 'value' => '1', 'sort' => 1, 'status' => 1],
-                    ['label' => '女', 'value' => '0', 'sort' => 2, 'status' => 1],
-                    ['label' => '保密', 'value' => '2', 'sort' => 3, 'status' => 1],
-                ]
-            ],
-        ];
-
-        foreach ($dictionaries as $dictData) {
-            $items = $dictData['items'] ?? [];
-            unset($dictData['items']);
-
-            $dictData['created_at'] = now();
-            $dictData['updated_at'] = now();
-
-            $dictId = DB::table('dictionaries')->insertGetId($dictData);
-
-            if (!empty($items)) {
-                foreach ($items as $item) {
-                    $item['dictionary_id'] = $dictId;
-                    $item['created_at'] = now();
-                    $item['updated_at'] = now();
-                    DB::table('dictionary_items')->insert($item);
-                }
-            }
         }
     }
 }

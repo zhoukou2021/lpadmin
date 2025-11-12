@@ -59,26 +59,13 @@ return [
             'roles' => 'lp_roles',
             'rules' => 'lp_rules',
             'users' => 'lp_users',
-            'uploads' => 'lp_uploads',
+            
             'options' => 'lp_options',
             'logs' => 'lp_admin_logs',
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Upload Configuration
-    |--------------------------------------------------------------------------
-    |
-    | These options control file upload behavior in LPadmin.
-    |
-    */
-    'upload' => [
-        'disk' => env('LPADMIN_UPLOAD_DISK', 'public'),
-        'path' => env('LPADMIN_UPLOAD_PATH', 'uploads'),
-        'max_size' => env('LPADMIN_UPLOAD_MAX_SIZE', 10240), // KB
-        'allowed_extensions' => ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx'],
-    ],
+    
 
     /*
     |--------------------------------------------------------------------------

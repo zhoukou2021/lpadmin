@@ -437,6 +437,37 @@ class Rule extends Model
     }
 
     /**
+     * 检查是否可以设置为父级（避免循环引用）
+     */
+    public function canSetAsParent(int $parentId): bool
+    {
+        // 不能将自己设置为父级
+        if ($parentId == $this->id) {
+            return false;
+        }
+
+        // 不能将自己的子级或子子级设置为父级
+        $childIds = $this->getAllChildIds();
+        return !in_array($parentId, $childIds);
+    }
+
+    /**
+     * 获取所有子级ID（递归）
+     */
+    public function getAllChildIds(): array
+    {
+        $childIds = [];
+        $children = $this->children;
+
+        foreach ($children as $child) {
+            $childIds[] = $child->id;
+            $childIds = array_merge($childIds, $child->getAllChildIds());
+        }
+
+        return $childIds;
+    }
+
+    /**
      * 获取显示状态标签
      */
     public function getShowLabelAttribute(): string

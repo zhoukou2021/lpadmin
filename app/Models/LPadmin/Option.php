@@ -42,6 +42,7 @@ class Option extends Model
         'options',
         'description',
         'sort',
+        'is_i18n',
     ];
 
     /**
@@ -49,6 +50,7 @@ class Option extends Model
      */
     protected $casts = [
         'sort' => 'integer',
+        'is_i18n' => 'boolean',
     ];
 
     /**
@@ -66,6 +68,7 @@ class Option extends Model
     const TYPE_COLOR = 'color';
     const TYPE_DATE = 'date';
     const TYPE_DATETIME = 'datetime';
+    const TYPE_RICHTEXT = 'richtext';
 
     /**
      * 配置类型标签
@@ -83,6 +86,7 @@ class Option extends Model
         self::TYPE_COLOR => '颜色',
         self::TYPE_DATE => '日期',
         self::TYPE_DATETIME => '日期时间',
+        self::TYPE_RICHTEXT => '富文本',
     ];
 
     /**

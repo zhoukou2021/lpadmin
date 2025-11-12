@@ -97,6 +97,7 @@
                                     <option value="color">颜色</option>
                                     <option value="date">日期</option>
                                     <option value="datetime">日期时间</option>
+                                    <option value="richtext">富文本</option>
                                 </select>
                             </div>
                         </div>
@@ -106,8 +107,17 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">配置值</label>
                     <div class="layui-input-block">
-                        <input type="text" name="value" placeholder="请输入配置值" class="layui-input">
+                        <input type="text" name="value" placeholder="请输入配置值" class="layui-input" id="value-input">
                         <div class="type-description">配置的默认值</div>
+                    </div>
+                </div>
+
+                <!-- 多语言开关 -->
+                <div class="layui-form-item" id="i18n-config" style="display: none;">
+                    <label class="layui-form-label">多语言</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="is_i18n" lay-skin="switch" lay-text="开启|关闭" value="1">
+                        <div class="type-description">开启后将支持多语言内容保存</div>
                     </div>
                 </div>
 
@@ -176,7 +186,7 @@
             const layer = layui.layer;
 
             const STORE_API = "{{ route('lpadmin.config.store') }}";
-            const GROUPS_API = "{{ route('lpadmin.config.groups') }}";
+            const GROUPS_API = "{{ route('lpadmin.config.groups.index') }}";
 
             // 需要选项配置的类型
             const optionTypes = ['select', 'radio', 'checkbox'];
@@ -188,7 +198,9 @@
             form.on('select(type-change)', function(data) {
                 const type = data.value;
                 const optionsConfig = $('#options-config');
+                const i18nConfig = $('#i18n-config');
                 
+                // 显示/隐藏选项配置
                 if (optionTypes.includes(type)) {
                     optionsConfig.show();
                     // 如果没有选项，添加默认选项
@@ -198,6 +210,13 @@
                     }
                 } else {
                     optionsConfig.hide();
+                }
+                
+                // 显示/隐藏多语言开关（text, textarea, richtext 类型显示）
+                if (['text', 'textarea', 'richtext'].includes(type)) {
+                    i18nConfig.show();
+                } else {
+                    i18nConfig.hide();
                 }
             });
 

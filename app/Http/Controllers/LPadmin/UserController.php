@@ -66,7 +66,7 @@ class UserController extends BaseController
      */
     public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'username' => 'required|string|max:50|unique:users,username',
             'password' => 'required|string|min:6|confirmed',
             'nickname' => 'nullable|string|max:50',
@@ -75,16 +75,25 @@ class UserController extends BaseController
             'avatar' => 'nullable|string',
             'gender' => 'nullable|in:0,1,2',
             'birthday' => 'nullable|date',
-        ], [
+        ];
+
+        // 如果上传了头像文件，则验证文件
+        if ($request->hasFile('avatar_file')) {
+            $rules['avatar_file'] = 'image|mimes:jpeg,jpg,png,gif|max:2048';
+        }
+
+        $validator = Validator::make($request->all(), $rules, [
             'username.required' => '用户名不能为空',
             'username.unique' => '用户名已存在',
             'password.required' => '密码不能为空',
             'password.min' => '密码至少6位',
             'password.confirmed' => '两次密码不一致',
-
             'email.email' => '邮箱格式不正确',
             'email.unique' => '邮箱已存在',
             'phone.unique' => '手机号已存在',
+            'avatar_file.image' => '头像必须是图片文件',
+            'avatar_file.mimes' => '头像格式必须是 jpeg、jpg、png 或 gif',
+            'avatar_file.max' => '头像大小不能超过 2MB',
         ]);
 
         if ($validator->fails()) {
@@ -96,6 +105,16 @@ class UserController extends BaseController
                 'username', 'nickname', 'email', 'phone',
                 'avatar', 'gender', 'birthday', 'status', 'remark'
             ]);
+
+            // 处理头像文件上传
+            $avatar = null;
+            if ($request->hasFile('avatar_file')) {
+                $path = $request->file('avatar_file')->store('uploads/avatars', 'public');
+                $avatar = '/storage/' . $path;
+            }
+            if ($avatar) {
+                $data['avatar'] = $avatar;
+            }
 
             $data['password'] = Hash::make($request->password);
             // 如果没有传递status，默认为启用
@@ -149,6 +168,11 @@ class UserController extends BaseController
             $rules['password'] = 'string|min:6|confirmed';
         }
 
+        // 如果上传了头像文件，则验证文件
+        if ($request->hasFile('avatar_file')) {
+            $rules['avatar_file'] = 'image|mimes:jpeg,jpg,png,gif|max:2048';
+        }
+
         $validator = Validator::make($request->all(), $rules, [
             'username.required' => '用户名不能为空',
             'username.unique' => '用户名已存在',
@@ -158,23 +182,32 @@ class UserController extends BaseController
             'phone.unique' => '手机号已存在',
             'password.min' => '密码至少6位',
             'password.confirmed' => '两次密码不一致',
+            'avatar_file.image' => '头像必须是图片文件',
+            'avatar_file.mimes' => '头像格式必须是 jpeg、jpg、png 或 gif',
+            'avatar_file.max' => '头像大小不能超过 2MB',
         ]);
 
         if ($validator->fails()) {
             return $this->error($validator->errors()->first());
         }
 
+        $avatar = null;
+        if ($request->hasFile('avatar_file')) {
+            $path = $request->file('avatar_file')->store('uploads/avatars', 'public');
+            $avatar = '/storage/' . $path;
+        }
         try {
             $data = $request->only([
                 'username', 'nickname', 'email', 'phone',
-                'avatar', 'gender', 'birthday','status','remark'
+                'avatar','gender', 'birthday','status','remark'
             ]);
-
+            if ($avatar) {
+                $data['avatar'] = $avatar;
+            }
             // 如果提供了密码，则更新密码
             if ($request->filled('password')) {
                 $data['password'] = Hash::make($request->password);
             }
-
             $user->update($data);
 
             $this->log('update', '更新用户', ['user_id' => $user->id]);

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('options')->nullable()->comment('选项配置');
             $table->string('description')->nullable()->comment('描述');
             $table->integer('sort')->default(0)->comment('排序');
+            $table->boolean('is_i18n')->default(false)->comment('是否多语言');
             $table->timestamps();
 
             $table->index(['group']);

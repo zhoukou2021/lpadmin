@@ -55,6 +55,16 @@
                           {{ $disabled ? 'disabled' : '' }}>{{ $value }}</textarea>
                 @break
 
+            {{-- 富文本编辑器 --}}
+            @case('richtext')
+                <textarea name="{{ $name }}"
+                          id="editor-{{ $fieldId }}"
+                          class="layui-textarea"
+                          rows="8"
+                          {{ $required ? 'lay-verify=required' : '' }}
+                          {{ $disabled ? 'disabled' : '' }}>{!! $value !!}</textarea>
+                @break
+
             {{-- 数字输入框 --}}
             @case('number')
                 <input type="number" 
@@ -255,6 +265,50 @@ layui.use(['upload', 'laydate', 'colorpicker'], function() {
                 }
             }
         });
+    @endif
+
+    @if($type === 'richtext' && !$disabled)
+        // 富文本编辑器 - TinyMCE
+        (function() {
+            function initEditor(base) {
+                if (!window.tinymce) return;
+                tinymce.remove('#editor-{{ $fieldId }}');
+                tinymce.init({
+                    selector: '#editor-{{ $fieldId }}',
+                    language: 'zh_CN',
+                    language_url: (base ? base : (window.tinymce.baseURL || '')) + '/langs/zh_CN.js',
+                    menubar: false,
+                    branding: false,
+                    height: 380,
+                    plugins: 'code preview link lists table image media fullscreen searchreplace autosave',
+                    toolbar: 'undo redo | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | removeformat | code preview fullscreen',
+                    convert_urls: false,
+                    images_upload_handler: function (blobInfo, success, failure) {
+                        // 简易处理：转为 base64 直接插入；如需上传到服务器，可在此处改为 AJAX 上传
+                        success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
+                    }
+                });
+            }
+
+            // 简化加载：固定本地路径，失败再回退 CDN
+            (function loadTinySimple(){
+                var base = '/static/admin/tinymce';
+                function load(src, cb, onerr){
+                    var s = document.createElement('script');
+                    s.src = src; s.onload = cb; s.onerror = onerr; document.head.appendChild(s);
+                }
+                if (!window.tinymce) {
+                    load(base + '/tinymce.min.js', function(){
+                        if (window.tinymce) window.tinymce.baseURL = base;
+                        initEditor(base);
+                    }, function(){
+                        load('https://cdn.staticfile.org/tinymce/6.8.3/tinymce.min.js', function(){ initEditor(''); });
+                    });
+                } else {
+                    initEditor(window.tinymce.baseURL || base);
+                }
+            })();
+        })();
     @endif
 
     @if($type === 'file' && !$disabled)

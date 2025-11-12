@@ -80,12 +80,24 @@ class ConfigController extends BaseController
      */
     private function getGroupTitle($group): string
     {
+        // 先从数据库查找分组元数据
+        $metaName = $group . '_group_meta';
+        $metaOption = Option::where('group', $group)
+            ->where('name', $metaName)
+            ->first();
+        
+        if ($metaOption && $metaOption->title) {
+            return $metaOption->title;
+        }
+
+        // 如果数据库中没有，使用默认映射
         $titles = [
             'system' => '系统配置',
             'security' => '安全配置',
             'upload' => '上传配置',
             'mail' => '邮件配置',
             'cache' => '缓存配置',
+            'deepseek' => 'DeepSeek AI配置',
         ];
 
         return $titles[$group] ?? ucfirst($group) . '配置';
@@ -96,12 +108,24 @@ class ConfigController extends BaseController
      */
     private function getGroupDescription($group): string
     {
+        // 先从数据库查找分组元数据
+        $metaName = $group . '_group_meta';
+        $metaOption = Option::where('group', $group)
+            ->where('name', $metaName)
+            ->first();
+        
+        if ($metaOption && $metaOption->description) {
+            return $metaOption->description;
+        }
+
+        // 如果数据库中没有，使用默认映射
         $descriptions = [
             'system' => '网站基本信息配置',
             'security' => '系统安全相关配置',
             'upload' => '文件上传相关配置',
             'mail' => '邮件发送相关配置',
             'cache' => '缓存系统相关配置',
+            'deepseek' => 'DeepSeek AI相关配置',
         ];
 
         return $descriptions[$group] ?? $group . '分组配置';
@@ -135,16 +159,23 @@ class ConfigController extends BaseController
         }
 
         try {
-            // 创建一个默认配置项来建立分组
+            // 创建分组元数据配置项
+            $metaName = $request->name . '_group_meta';
             Option::create([
                 'group' => $request->name,
-                'name' => $request->name . '_group_placeholder',
-                'title' => '分组占位符',
-                'value' => '',
+                'name' => $metaName,
+                'title' => $request->title,
+                'value' => json_encode([
+                    'title' => $request->title,
+                    'description' => $request->description ?? '',
+                ]),
                 'type' => 'text',
-                'description' => '此配置项用于建立分组，可以删除',
+                'description' => $request->description ?? '',
                 'sort' => 0,
             ]);
+
+            // 清除分组缓存
+            Option::clearCache();
 
             $this->log('create', '创建配置分组', [
                 'group' => $request->name,
@@ -174,7 +205,41 @@ class ConfigController extends BaseController
         }
 
         try {
-            // 更新分组信息（这里只是记录日志，实际的分组信息存储在代码中）
+            // 查找或创建分组元数据配置项
+            // 使用特殊名称存储分组元数据：{group}_group_meta
+            $metaName = $group . '_group_meta';
+            $metaOption = Option::where('group', $group)
+                ->where('name', $metaName)
+                ->first();
+
+            if ($metaOption) {
+                // 更新现有元数据
+                $metaOption->update([
+                    'title' => $request->title,
+                    'description' => $request->description ?? '',
+                ]);
+            } else {
+                // 创建新的元数据配置项
+                // 获取该分组的最小sort值，将元数据放在最前面
+                $minSort = Option::where('group', $group)->min('sort') ?? 0;
+                
+                Option::create([
+                    'group' => $group,
+                    'name' => $metaName,
+                    'title' => $request->title,
+                    'value' => json_encode([
+                        'title' => $request->title,
+                        'description' => $request->description ?? '',
+                    ]),
+                    'type' => 'text',
+                    'description' => $request->description ?? '',
+                    'sort' => $minSort - 1, // 放在最前面
+                ]);
+            }
+
+            // 清除分组缓存
+            Option::clearCache();
+
             $this->log('update', '更新配置分组', [
                 'group' => $group,
                 'title' => $request->title
@@ -281,10 +346,11 @@ class ConfigController extends BaseController
             'name' => 'required|string|max:100|unique:options,name',
             'title' => 'required|string|max:100',
             'value' => 'nullable|string',
-            'type' => 'required|in:text,textarea,number,select,radio,checkbox,switch,image,file,date,datetime,color',
+            'type' => 'required|in:text,textarea,number,select,radio,checkbox,switch,image,file,date,datetime,color,richtext',
             'options' => 'nullable|string',
             'description' => 'nullable|string',
             'sort' => 'nullable|integer|min:0',
+            'is_i18n' => 'nullable|boolean',
         ], [
             'group.required' => '配置分组不能为空',
             'name.required' => '配置名称不能为空',
@@ -300,10 +366,11 @@ class ConfigController extends BaseController
         try {
             $data = $request->only([
                 'group', 'name', 'title', 'value', 'type',
-                'options', 'description', 'sort'
+                'options', 'description', 'sort', 'is_i18n'
             ]);
 
             $data['sort'] = $data['sort'] ?: 0;
+            $data['is_i18n'] = $data['is_i18n'] ?? false;
 
             $option = Option::create($data);
 
@@ -351,10 +418,11 @@ class ConfigController extends BaseController
                 'name' => 'required|string|max:100|unique:options,name,' . $option->id,
                 'title' => 'required|string|max:100',
                 'value' => 'nullable|string',
-                'type' => 'required|in:text,textarea,number,select,radio,checkbox,switch,image,file,date,datetime,color',
+                'type' => 'required|in:text,textarea,number,select,radio,checkbox,switch,image,file,date,datetime,color,richtext',
                 'options' => 'nullable|string',
                 'description' => 'nullable|string',
                 'sort' => 'nullable|integer|min:0',
+                'is_i18n' => 'nullable|boolean',
             ], [
                 'group.required' => '配置分组不能为空',
                 'name.required' => '配置名称不能为空',
@@ -369,10 +437,11 @@ class ConfigController extends BaseController
 
             $data = $request->only([
                 'group', 'name', 'title', 'value', 'type',
-                'options', 'description', 'sort'
+                'options', 'description', 'sort', 'is_i18n'
             ]);
 
             $data['sort'] = $data['sort'] ?: 0;
+            $data['is_i18n'] = $data['is_i18n'] ?? false;
 
             $option->update($data);
 
@@ -485,7 +554,8 @@ class ConfigController extends BaseController
      */
     public function system(): View
     {
-        $systemConfigs = Option::where('group', 'system')->orderBy('sort')->get();
+        // 加载所有分组配置，按分组与排序展示为 Tabs
+        $systemConfigs = Option::orderBy('group')->orderBy('sort')->get();
         return view('lpadmin.config.system', compact('systemConfigs'));
     }
 
@@ -501,7 +571,12 @@ class ConfigController extends BaseController
             foreach ($configs as $name => $value) {
                 $option = Option::where('name', $name)->first();
                 if ($option) {
-                    $option->update(['value' => $value ?? '']);
+                    // 如果是多语言配置且是 JSON 字符串，直接保存（前端已转换为 JSON）
+                    if ($option->is_i18n && in_array($option->type, ['text', 'textarea', 'richtext']) && is_string($value) && $this->isJson($value)) {
+                        $option->update(['value' => $value]);
+                    } else {
+                        $option->update(['value' => $value ?? '']);
+                    }
                     Option::clearCache($option->name);
                     $updated++;
                 }
@@ -513,6 +588,18 @@ class ConfigController extends BaseController
         } catch (\Exception $e) {
             return $this->error('保存失败: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * 判断字符串是否为 JSON 格式
+     */
+    private function isJson($string): bool
+    {
+        if (!is_string($string)) {
+            return false;
+        }
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     /**

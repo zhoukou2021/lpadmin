@@ -97,6 +97,7 @@
                                     <option value="color" {{ $option->type === 'color' ? 'selected' : '' }}>颜色</option>
                                     <option value="date" {{ $option->type === 'date' ? 'selected' : '' }}>日期</option>
                                     <option value="datetime" {{ $option->type === 'datetime' ? 'selected' : '' }}>日期时间</option>
+                                    <option value="richtext" {{ $option->type === 'richtext' ? 'selected' : '' }}>富文本</option>
                                 </select>
                             </div>
                         </div>
@@ -112,6 +113,15 @@
                             <input type="text" name="value" placeholder="请输入配置值" class="layui-input" value="{{ $option->value }}">
                         @endif
                         <div class="type-description">配置的当前值</div>
+                    </div>
+                </div>
+
+                <!-- 多语言开关 -->
+                <div class="layui-form-item" id="i18n-config" style="display: {{ in_array($option->type, ['text', 'textarea', 'richtext']) ? 'block' : 'none' }};">
+                    <label class="layui-form-label">多语言</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="is_i18n" lay-skin="switch" lay-text="开启|关闭" value="1" {{ $option->is_i18n ? 'checked' : '' }}>
+                        <div class="type-description">开启后将支持多语言内容保存</div>
                     </div>
                 </div>
 
@@ -200,7 +210,9 @@
             form.on('select(type-change)', function(data) {
                 const type = data.value;
                 const optionsConfig = $('#options-config');
+                const i18nConfig = $('#i18n-config');
                 
+                // 显示/隐藏选项配置
                 if (optionTypes.includes(type)) {
                     optionsConfig.show();
                     // 如果没有选项，添加默认选项
@@ -210,6 +222,13 @@
                     }
                 } else {
                     optionsConfig.hide();
+                }
+                
+                // 显示/隐藏多语言开关（text, textarea, richtext 类型显示）
+                if (['text', 'textarea', 'richtext'].includes(type)) {
+                    i18nConfig.show();
+                } else {
+                    i18nConfig.hide();
                 }
             });
 

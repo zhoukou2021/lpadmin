@@ -69,11 +69,11 @@
     <script>
         // 相关常量
         const PRIMARY_KEY = "name";
-        const SELECT_API = "/lpadmin/config/groups";
-        const CREATE_API = "/lpadmin/config/groups";
-        const UPDATE_API = "/lpadmin/config/groups/";
-        const REMOVE_API = "/lpadmin/config/groups/";
-        const BATCH_REMOVE_API = "/lpadmin/config/groups/batch";
+        const SELECT_API = "/lpadmin/config/groups"; // GET
+        const CREATE_API = "/lpadmin/config/groups/create-groups"; // POST
+        const UPDATE_API = "/lpadmin/config/groups/"; // PUT {group}
+        const REMOVE_API = "/lpadmin/config/groups/del-groups/"; // DELETE {group}
+        const BATCH_REMOVE_API = "/lpadmin/config/groups/groups-batch"; // DELETE
 
         layui.use(['table', 'form', 'jquery', 'popup'], function () {
             let table = layui.table;
@@ -217,7 +217,7 @@
                         
                         // 表单提交
                         form.on('submit(submit)', function(formData) {
-                            const url = isEdit ? `/lpadmin/config/groups/${data.name}` : '/lpadmin/config/groups';
+                            const url = isEdit ? `/lpadmin/config/groups/${data.name}` : CREATE_API;
                             const method = isEdit ? 'PUT' : 'POST';
                             
                             $.ajax({
@@ -252,23 +252,33 @@
                 $.ajax({
                     url: REMOVE_API + name,
                     method: 'DELETE',
+                    dataType: 'json',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(result) {
-                        if (result.code === 0) {
-                            layer.msg(result.message, {icon: 1});
+                        if (result && result.code === 0) {
+                            layer.msg(result.message || '操作成功', {icon: 1});
                             if (obj) {
                                 obj.del();
                             } else {
                                 table.reload('group-table');
                             }
                         } else {
-                            layer.msg(result.message, {icon: 2});
+                            layer.msg((result && result.message) ? result.message : '操作失败', {icon: 2});
                         }
                     },
-                    error: function() {
-                        layer.msg('删除失败', {icon: 2});
+                    error: function(xhr) {
+                        var msg = '网络错误';
+                        if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        } else if (xhr && xhr.responseText) {
+                            try {
+                                var json = JSON.parse(xhr.responseText);
+                                if (json && json.message) msg = json.message;
+                            } catch (e) {}
+                        }
+                        layer.msg(msg, {icon: 2});
                     }
                 });
             }
@@ -278,20 +288,30 @@
                 $.ajax({
                     url: BATCH_REMOVE_API,
                     method: 'DELETE',
+                    dataType: 'json',
                     data: {names: names},
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(result) {
-                        if (result.code === 0) {
-                            layer.msg(result.message, {icon: 1});
+                        if (result && result.code === 0) {
+                            layer.msg(result.message || '操作成功', {icon: 1});
                             table.reload('group-table');
                         } else {
-                            layer.msg(result.message, {icon: 2});
+                            layer.msg((result && result.message) ? result.message : '操作失败', {icon: 2});
                         }
                     },
-                    error: function() {
-                        layer.msg('批量删除失败', {icon: 2});
+                    error: function(xhr) {
+                        var msg = '网络错误';
+                        if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        } else if (xhr && xhr.responseText) {
+                            try {
+                                var json = JSON.parse(xhr.responseText);
+                                if (json && json.message) msg = json.message;
+                            } catch (e) {}
+                        }
+                        layer.msg(msg, {icon: 2});
                     }
                 });
             }

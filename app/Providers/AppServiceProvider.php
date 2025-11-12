@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
-use App\Services\LPadmin\ComponentManager;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,12 +23,7 @@ class AppServiceProvider extends ServiceProvider
         // 设置默认字符串长度，解决MySQL索引长度限制问题
         Schema::defaultStringLength(191);
 
-        // 注册已安装组件的服务提供者
-        try {
-            ComponentManager::registerAllInstalledProviders();
-        } catch (\Exception $e) {
-            // 忽略错误，避免在迁移时出现问题
-        }
+        // 组件模块已移除：不再注册组件服务提供者
         $this->app['url']->forceRootUrl(config('app.url'));
     }
 }

@@ -26,6 +26,7 @@
         .type-color { background-color: #faad14; }
         .type-date { background-color: #a0d911; }
         .type-datetime { background-color: #096dd9; }
+        .type-richtext { background-color: #722ed1; }
         
         .config-value {
             max-width: 200px;
@@ -138,6 +139,7 @@
                                 <option value="color">颜色</option>
                                 <option value="date">日期</option>
                                 <option value="datetime">日期时间</option>
+                                <option value="richtext">富文本</option>
                             </select>
                         </div>
                     </div>

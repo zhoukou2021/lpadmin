@@ -59,9 +59,9 @@
                         ['value' => '1', 'title' => '菜单'],
                         ['value' => '2', 'title' => '按钮']
                     ],
-                    'default' => $menu->type,
-                    'help' => $menu->type == 0 ? '目录：用于组织菜单结构，不对应具体页面' :
-                             ($menu->type == 1 ? '菜单：显示在左侧菜单栏中的页面链接' :
+                    'default' => (string)($typeCode ?? 1),
+                    'help' => ($typeCode ?? 1) == 0 ? '目录：用于组织菜单结构，不对应具体页面' :
+                             (($typeCode ?? 1) == 1 ? '菜单：显示在左侧菜单栏中的页面链接' :
                              '按钮：不在菜单中显示，用于权限控制的操作标识（如：添加、编辑、删除等）')
                 ])
 
@@ -154,7 +154,7 @@
                 RadioHelper.init('status');
 
                 // 设置当前值
-                RadioHelper.setValue('type', '{{ $menu->type }}');
+                RadioHelper.setValue('type', '{{ (string)($typeCode ?? 1) }}');
                 RadioHelper.setValue('is_show', '{{ $menu->is_show }}');
                 RadioHelper.setValue('status', '{{ $menu->status }}');
             }

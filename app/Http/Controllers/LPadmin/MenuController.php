@@ -24,7 +24,9 @@ class MenuController extends BaseController
     public function select(Request $request): JsonResponse
     {
         try {
-            $query = Rule::where('type', Rule::TYPE_MENU);
+            $query = Rule::query();
+				// 仅返回目录/菜单类型数据，排除按钮/API 类型
+				$query->where('type', Rule::TYPE_MENU);
 
             // 搜索条件
             if ($request->filled('title')) {
@@ -35,8 +37,31 @@ class MenuController extends BaseController
                 $query->where('status', $request->status);
             }
 
+            // 类型筛选（前端 0/1/2）：0 目录（menu 且 url 为空）、1 菜单（menu 且 url 非空）、2 按钮（包括 button/api）
             if ($request->filled('type')) {
-                $query->where('type', $request->type);
+                $typeParam = $request->type;
+                if (in_array((string)$typeParam, ['0','1','2'])) {
+                    if ($typeParam == '2') {
+                        $query->whereIn('type', [Rule::TYPE_BUTTON, Rule::TYPE_API]);
+                    } else {
+                        $query->where('type', Rule::TYPE_MENU);
+                        if ($typeParam == '0') {
+                            $query->where(function($q){ $q->whereNull('url')->orWhere('url',''); });
+                        } else if ($typeParam == '1') {
+                            $query->whereNotNull('url')->where('url','<>','');
+                        }
+                    }
+                } else {
+                    // 若前端传字符串，做兼容
+                    $norm = $this->normalizeRuleType($typeParam);
+                    if ($norm === Rule::TYPE_BUTTON) {
+                        $query->whereIn('type', [Rule::TYPE_BUTTON, Rule::TYPE_API]);
+                    } else if ($norm === Rule::TYPE_MENU) {
+                        $query->where('type', Rule::TYPE_MENU);
+                    } else if ($norm === Rule::TYPE_API) {
+                        $query->where('type', Rule::TYPE_API);
+                    }
+                }
             }
 
             // 树形结构排序：先按父级ID分组，再按sort排序
@@ -55,7 +80,19 @@ class MenuController extends BaseController
                 return $this->success($menuArray, '获取成功');
             }
 
-            return $this->success($menus->toArray(), '获取成功');
+            // 输出前将 type 转换为前端使用的数值码：0 目录、1 菜单、2 按钮
+            $list = $menus->map(function($m) {
+                $arr = $m->toArray();
+                if ($m->type !== Rule::TYPE_MENU) {
+                    $arr['type'] = 2; // 按钮/接口
+                } else {
+                    $isDirectory = empty($m->url);
+                    $arr['type'] = $isDirectory ? 0 : 1;
+                }
+                return $arr;
+            })->toArray();
+
+            return $this->success($list, '获取成功');
 
         } catch (\Exception $e) {
             return $this->error('获取失败：' . $e->getMessage());
@@ -77,13 +114,17 @@ class MenuController extends BaseController
     public function store(Request $request): JsonResponse
     {
         try {
+            // 类型映射预处理
+            $input = $request->all();
+            $input['type'] = $this->normalizeRuleType($input['type'] ?? null);
+
             $rules = [
                 'title' => 'required|string|max:100',
                 'name' => 'required|string|max:100|unique:rules,name',
                 'parent_id' => 'required|integer|min:0',
                 'icon' => 'nullable|string|max:50',
                 'url' => 'nullable|string|max:255',
-                'type' => 'required|integer|in:0,1,2',
+                'type' => 'required|string|in:menu,button,api',
                 'target' => 'nullable|string|max:20',
                 'is_show' => 'required|integer|in:0,1',
                 'status' => 'required|integer|in:0,1',
@@ -110,16 +151,28 @@ class MenuController extends BaseController
                 'sort.min' => '排序不能小于0',
             ];
 
-            $request->validate($rules, $messages);
+            $validator = \Validator::make($input, $rules, $messages);
+            if ($validator->fails()) {
+                return $this->error('验证失败', 400, $validator->errors()->toArray());
+            }
 
-            $data = $request->only([
-                'parent_id', 'title', 'name', 'icon', 'url',
-                'type', 'target', 'is_show', 'status', 'sort', 'remark'
-            ]);
+            $data = [
+                'parent_id' => (int)($input['parent_id'] ?? 0),
+                'title' => $input['title'] ?? '',
+                'name' => $input['name'] ?? '',
+                'icon' => $input['icon'] ?? null,
+                'url' => $input['url'] ?? null,
+                'type' => $input['type'] ?? 'menu',
+                'target' => $input['target'] ?? '_self',
+                'is_show' => (int)($input['is_show'] ?? 1),
+                'status' => (int)($input['status'] ?? 1),
+                'sort' => (int)($input['sort'] ?? 0),
+                'remark' => $input['remark'] ?? null,
+            ];
 
-            // 如果没有传递target，默认为_self
-            if (!isset($data['target'])) {
-                $data['target'] = '_self';
+            // 非菜单类型一律不显示在菜单树
+            if ($data['type'] !== Rule::TYPE_MENU) {
+                $data['is_show'] = 0;
             }
 
             Rule::create($data);
@@ -139,8 +192,13 @@ class MenuController extends BaseController
     public function edit($id): View
     {
         $menu = Rule::findOrFail($id);
+        // 计算前端需要的类型码：0 目录、1 菜单、2 按钮
+        $typeCode = 2;
+        if ($menu->type === Rule::TYPE_MENU) {
+            $typeCode = empty($menu->url) ? 0 : 1;
+        }
         $parentOptions = Rule::getParentOptions($id);
-        return view('lpadmin.menu.edit', compact('menu', 'parentOptions'));
+        return view('lpadmin.menu.edit', compact('menu', 'parentOptions', 'typeCode'));
     }
 
     /**
@@ -150,6 +208,10 @@ class MenuController extends BaseController
     {
         try {
             $menu = Rule::findOrFail($id);
+
+            // 类型映射预处理
+            $input = $request->all();
+            $input['type'] = $this->normalizeRuleType($input['type'] ?? null);
 
             $rules = [
                 'title' => 'required|string|max:100',
@@ -162,7 +224,7 @@ class MenuController extends BaseController
                 'parent_id' => 'required|integer|min:0',
                 'icon' => 'nullable|string|max:50',
                 'url' => 'nullable|string|max:255',
-                'type' => 'required|integer|in:0,1,2',
+                'type' => 'required|string|in:menu,button,api',
                 'target' => 'nullable|string|max:20',
                 'is_show' => 'required|integer|in:0,1',
                 'status' => 'required|integer|in:0,1',
@@ -189,21 +251,33 @@ class MenuController extends BaseController
                 'sort.min' => '排序不能小于0',
             ];
 
-            $request->validate($rules, $messages);
+            $validator = \Validator::make($input, $rules, $messages);
+            if ($validator->fails()) {
+                return $this->error('验证失败', 400, $validator->errors()->toArray());
+            }
 
-            $data = $request->only([
-                'parent_id', 'title', 'name', 'icon', 'url',
-                'type', 'target', 'is_show', 'status', 'sort', 'remark'
-            ]);
+            $data = [
+                'parent_id' => (int)($input['parent_id'] ?? 0),
+                'title' => $input['title'] ?? '',
+                'name' => $input['name'] ?? '',
+                'icon' => $input['icon'] ?? null,
+                'url' => $input['url'] ?? null,
+                'type' => $input['type'] ?? 'menu',
+                'target' => $input['target'] ?? '_self',
+                'is_show' => (int)($input['is_show'] ?? 1),
+                'status' => (int)($input['status'] ?? 1),
+                'sort' => (int)($input['sort'] ?? 0),
+                'remark' => $input['remark'] ?? null,
+            ];
+
+            // 非菜单类型一律不显示在菜单树
+            if ($data['type'] !== Rule::TYPE_MENU) {
+                $data['is_show'] = 0;
+            }
 
             // 验证父级菜单设置（避免循环引用）
             if ($data['parent_id'] != 0 && !$menu->canSetAsParent($data['parent_id'])) {
                 return $this->error('不能将自己或子菜单设置为父菜单');
-            }
-
-            // 如果没有传递target，默认为_self
-            if (!isset($data['target'])) {
-                $data['target'] = '_self';
             }
 
             $menu->update($data);
@@ -426,23 +500,20 @@ class MenuController extends BaseController
     }
 
     /**
-     * 过滤菜单权限（排除功能权限）
-     *
-     * @param array $permissions
-     * @return array
+     * 归一化菜单类型：将前端的“目录/数字码”等映射为数据库允许的枚举
+     * 规则：0/1 => menu（0 表示目录概念）、2 => button、3 => api；'directory' => 'menu'、'deny' => 'api'
      */
-    private function filterMenuPermissions(array $permissions): array
+    private function normalizeRuleType($type): ?string
     {
-        $menuPermissions = [];
-
-        foreach ($permissions as $permission) {
-            // 只保留不包含点号的权限（主权限）作为菜单权限
-            // 例如：'user' 是菜单权限，'user.view' 是功能权限
-            if (strpos($permission, '.') === false) {
-                $menuPermissions[] = $permission;
-            }
+        if ($type === null) return null;
+        if (is_numeric($type)) {
+            $map = [0 => 'menu', 1 => 'menu', 2 => 'button', 3 => 'api'];
+            return $map[(int)$type] ?? 'menu';
         }
-
-        return $menuPermissions;
+        $t = strtolower((string)$type);
+        if ($t === 'directory') return 'menu';
+        if ($t === 'deny') return 'api';
+        if (in_array($t, ['menu','button','api'])) return $t;
+        return 'menu';
     }
 }
